@@ -1,9 +1,5 @@
--- ===========================================================================
 -- V1: Base schema — mirrors the original create_database.sql
 -- Uses IF NOT EXISTS so it is safe on the pre-populated SQLite file.
--- ===========================================================================
-
-PRAGMA foreign_keys = ON;
 
 -- Table 1: Room Types
 CREATE TABLE IF NOT EXISTS room_types (
