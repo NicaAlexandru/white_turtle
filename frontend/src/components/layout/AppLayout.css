@@ -1,0 +1,42 @@
+.app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-toolbar-icon {
+  margin-right: 12px;
+}
+
+.app-toolbar-title {
+  flex-grow: 1;
+  font-weight: 600;
+}
+
+.student-id-input {
+  width: 120px;
+}
+
+.student-id-input .MuiInputBase-root {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.student-id-input .MuiInputLabel-root {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.student-id-input .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.app-tabs {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.app-content {
+  flex: 1;
+  padding-top: 24px;
+  padding-bottom: 24px;
+}

@@ -1,0 +1,45 @@
+.grid-table {
+  table-layout: fixed;
+}
+
+.grid-header-cell {
+  font-weight: 700;
+}
+
+.grid-time-column {
+  width: 110px;
+}
+
+.grid-time-cell {
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+.grid-lunch-cell {
+  background-color: #f5f5f5;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.75rem;
+}
+
+.grid-empty-cell {
+  height: 64px;
+}
+
+.grid-course-cell {
+  height: 64px;
+  cursor: pointer;
+  color: white;
+  border-radius: 0;
+}
+
+.grid-course-cell:hover {
+  opacity: 0.85;
+}
+
+.grid-course-code {
+  font-weight: 700;
+}
+
+.grid-course-room {
+  font-size: 0.65rem;
+}

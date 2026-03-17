@@ -1,0 +1,23 @@
+.stat-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.stat-card-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.graduation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.graduation-progress-bar {
+  height: 10px;
+  border-radius: 5px;
+}
