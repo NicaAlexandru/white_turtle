@@ -27,33 +27,40 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, activeTab, onTabChange 
 
   return (
     <Box className="app-root">
-      <AppBar position="static" elevation={1}>
-        <Toolbar>
-          <SchoolIcon className="app-toolbar-icon" />
-          <Typography variant="h6" component="div" className="app-toolbar-title">
+      <AppBar position="static" elevation={0} className="app-bar">
+        <Toolbar variant="dense">
+          <SchoolIcon className="app-toolbar-icon" fontSize="small" />
+          <Typography variant="subtitle1" component="div" className="app-toolbar-title">
             Maplewood High School
           </Typography>
-          <TextField
-            size="small"
-            label="Student ID"
-            value={studentIdInput}
-            onChange={(e) => setStudentIdInput(e.target.value)}
-            onKeyDown={handleStudentIdChange}
-            className="student-id-input"
-          />
+          <Box className="student-id-wrapper">
+            <Typography variant="caption" className="student-id-label">
+              Student ID
+            </Typography>
+            <TextField
+              size="small"
+              variant="outlined"
+              value={studentIdInput}
+              onChange={(e) => setStudentIdInput(e.target.value)}
+              onKeyDown={handleStudentIdChange}
+              className="student-id-input"
+            />
+          </Box>
         </Toolbar>
+      </AppBar>
+      <Box className="app-tabs-bar">
         <Tabs
           value={activeTab}
           onChange={(_, newValue) => onTabChange(newValue)}
-          textColor="inherit"
-          indicatorColor="secondary"
+          textColor="primary"
+          indicatorColor="primary"
           className="app-tabs"
         >
           <Tab label="Dashboard" />
           <Tab label="Course Browser" />
           <Tab label="Schedule Builder" />
         </Tabs>
-      </AppBar>
+      </Box>
       <Container maxWidth="xl" className="app-content">
         {children}
       </Container>

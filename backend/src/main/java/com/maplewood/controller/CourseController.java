@@ -20,9 +20,10 @@ public class CourseController {
     @GetMapping
     public ResponseEntity<Page<CourseDTO>> getCourses(
         @RequestParam(required = false) Integer grade,
-        @RequestParam(required = false) Integer semester, 
+        @RequestParam(required = false) Integer semester,
+        @RequestParam(required = false) String search,
         @PageableDefault(size = 10) Pageable pageable) {
-        return ResponseEntity.ok(courseService.getAllCourses(grade, semester, pageable));
+        return ResponseEntity.ok(courseService.getAllCourses(grade, semester, search, pageable));
     }
 
     @GetMapping("/{id}")

@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Box, Grid, Typography, Pagination } from '@mui/material';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { Box, Grid, Typography, Pagination, FormControl, Select, MenuItem, InputLabel } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchCourses, fetchSections, setFilters, clearFilters, setCoursePage } from '../../store/slices/coursesSlice';
+import { fetchCourses, fetchSections, setFilters, clearFilters, setCoursePage, setPageSize } from '../../store/slices/coursesSlice';
 import { enrollInSection, clearValidationError, clearSuccessMessage, fetchSchedule } from '../../store/slices/scheduleSlice';
 import { Course, CourseSection } from '../../types';
 import CourseCard from './CourseCard';
@@ -10,6 +10,8 @@ import SectionPickerDialog from './SectionPickerDialog';
 import LoadingSpinner from '../common/LoadingSpinner';
 import ErrorAlert from '../common/ErrorAlert';
 import SuccessSnackbar from '../common/SuccessSnackbar';
+
+const SEARCH_DEBOUNCE_MS = 600;
 
 const CourseBrowser: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -23,14 +25,22 @@ const CourseBrowser: React.FC = () => {
 
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [sectionDialogOpen, setSectionDialogOpen] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const searchTimer = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     dispatch(fetchCourses({
       grade: filters.grade,
       semester: filters.semester,
+      search: filters.search,
       page: pagination.page,
+      size: pagination.size,
     }));
-  }, [dispatch, filters.grade, filters.semester, pagination.page]);
+  }, [dispatch, filters.grade, filters.semester, filters.search, pagination.page, pagination.size]);
+
+  useEffect(() => {
+    return () => { clearTimeout(searchTimer.current); };
+  }, []);
 
   const handleGradeChange = useCallback(
     (grade?: number) => dispatch(setFilters({ ...filters, grade })),
@@ -42,7 +52,19 @@ const CourseBrowser: React.FC = () => {
     [dispatch, filters]
   );
 
-  const handleClearFilters = useCallback(() => dispatch(clearFilters()), [dispatch]);
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchText(value);
+    clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => {
+      dispatch(setFilters({ ...filters, search: value || undefined }));
+    }, SEARCH_DEBOUNCE_MS);
+  }, [dispatch, filters]);
+
+  const handleClearFilters = useCallback(() => {
+    setSearchText('');
+    clearTimeout(searchTimer.current);
+    dispatch(clearFilters());
+  }, [dispatch]);
 
   const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
     dispatch(setCoursePage(page - 1));
@@ -55,9 +77,12 @@ const CourseBrowser: React.FC = () => {
   };
 
   const handleEnroll = async (section: CourseSection) => {
-    await dispatch(enrollInSection({ studentId: selectedStudentId, sectionId: section.id }));
-    dispatch(fetchSchedule(selectedStudentId));
-    setSectionDialogOpen(false);
+    const result = await dispatch(enrollInSection({ studentId: selectedStudentId, sectionId: section.id }));
+    if (enrollInSection.fulfilled.match(result)) {
+      setSectionDialogOpen(false);
+      dispatch(fetchSchedule(selectedStudentId));
+      dispatch(fetchCourses({ grade: filters.grade, semester: filters.semester, search: filters.search, page: pagination.page, size: pagination.size }));
+    }
   };
 
   const isPrerequisiteMet = (course: Course): boolean => {
@@ -73,7 +98,7 @@ const CourseBrowser: React.FC = () => {
     return schedule.entries.some((e) => e.courseId === course.id);
   };
 
-  if (status === 'loading') return <LoadingSpinner message="Loading courses..." />;
+  if (status === 'loading' && courses.length === 0) return <LoadingSpinner message="Loading courses..." />;
   if (status === 'failed') return <ErrorAlert message={error || 'Failed to load courses'} />;
 
   return (
@@ -88,8 +113,10 @@ const CourseBrowser: React.FC = () => {
       <CourseFilters
         grade={filters.grade}
         semester={filters.semester}
+        search={searchText}
         onGradeChange={handleGradeChange}
         onSemesterChange={handleSemesterChange}
+        onSearchChange={handleSearchChange}
         onClear={handleClearFilters}
       />
 
@@ -112,16 +139,28 @@ const CourseBrowser: React.FC = () => {
         </Box>
       )}
 
-      {pagination.totalPages > 1 && (
-        <Box display="flex" justifyContent="center" mt={3}>
+      <Box display="flex" justifyContent="center" alignItems="center" gap={3} mt={3}>
+        {pagination.totalPages > 1 && (
           <Pagination
             count={pagination.totalPages}
             page={pagination.page + 1}
             onChange={handlePageChange}
             color="primary"
           />
-        </Box>
-      )}
+        )}
+        <FormControl size="small" style={{ minWidth: 100 }}>
+          <InputLabel>Per page</InputLabel>
+          <Select
+            value={pagination.size}
+            label="Per page"
+            onChange={(e) => dispatch(setPageSize(Number(e.target.value)))}
+          >
+            <MenuItem value={12}>12</MenuItem>
+            <MenuItem value={24}>24</MenuItem>
+            <MenuItem value={48}>48</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
 
       <SectionPickerDialog
         open={sectionDialogOpen}

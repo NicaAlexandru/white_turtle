@@ -15,12 +15,12 @@ const StatCard: React.FC<StatCardProps> = ({
   icon,
   label,
   value,
-  valueColor = 'primary.main',
+  valueColor = 'text.primary',
   caption,
   extra,
 }) => {
   return (
-    <Card elevation={2}>
+    <Card elevation={1} className="stat-card">
       <CardContent>
         <Box className="stat-card-header">
           {icon}

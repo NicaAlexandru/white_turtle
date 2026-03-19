@@ -10,7 +10,10 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Box,
 } from '@mui/material';
+import HistoryIcon from '@mui/icons-material/History';
+import './StudentDashboard.css';
 import { CourseHistory as CourseHistoryType } from '../../types';
 
 interface CourseHistoryProps {
@@ -59,9 +62,15 @@ const CourseHistory: React.FC<CourseHistoryProps> = ({ history }) => {
               {history.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} align="center">
-                    <Typography variant="body2" color="text.secondary" py={2}>
-                      No course history yet.
-                    </Typography>
+                    <Box className="empty-history">
+                      <HistoryIcon className="empty-history-icon" />
+                      <Typography variant="body2" color="text.secondary">
+                        No course history yet
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Completed courses will appear here
+                      </Typography>
+                    </Box>
                   </TableCell>
                 </TableRow>
               )}

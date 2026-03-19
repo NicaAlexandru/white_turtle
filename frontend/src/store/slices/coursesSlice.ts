@@ -8,9 +8,11 @@ interface CoursesState {
   filters: {
     grade?: number;
     semester?: number;
+    search?: string;
   };
   pagination: {
     page: number;
+    size: number;
     totalPages: number;
     totalElements: number;
   };
@@ -28,7 +30,7 @@ const initialState: CoursesState = {
   items: [],
   sections: [],
   filters: {},
-  pagination: { page: 0, totalPages: 0, totalElements: 0 },
+  pagination: { page: 0, size: 12, totalPages: 0, totalElements: 0 },
   sectionsPagination: { page: 0, totalPages: 0, totalElements: 0 },
   status: 'idle',
   sectionsStatus: 'idle',
@@ -37,10 +39,10 @@ const initialState: CoursesState = {
 
 export const fetchCourses = createAsyncThunk(
   'courses/fetchCourses',
-  async ({ grade, semester, page = 0, size = 10 }: {
-    grade?: number; semester?: number; page?: number; size?: number;
+  async ({ grade, semester, search, page = 0, size = 12 }: {
+    grade?: number; semester?: number; search?: string; page?: number; size?: number;
   }) => {
-    const response = await coursesApi.getAll(grade, semester, page, size);
+    const response = await coursesApi.getAll(grade, semester, search, page, size);
     return response.data;
   }
 );
@@ -59,9 +61,9 @@ const coursesSlice = createSlice({
   name: 'courses',
   initialState,
   reducers: {
-    setFilters(state, action: PayloadAction<{ grade?: number; semester?: number }>) {
+    setFilters(state, action: PayloadAction<{ grade?: number; semester?: number; search?: string }>) {
       state.filters = action.payload;
-      state.pagination.page = 0; // reset page on filter change
+      state.pagination.page = 0;
     },
     clearFilters(state) {
       state.filters = {};
@@ -69,6 +71,10 @@ const coursesSlice = createSlice({
     },
     setCoursePage(state, action: PayloadAction<number>) {
       state.pagination.page = action.payload;
+    },
+    setPageSize(state, action: PayloadAction<number>) {
+      state.pagination.size = action.payload;
+      state.pagination.page = 0;
     },
   },
   extraReducers: (builder) => {
@@ -82,6 +88,7 @@ const coursesSlice = createSlice({
         state.status = 'succeeded';
         state.items = action.payload.content;
         state.pagination = {
+          ...state.pagination,
           page: action.payload.number,
           totalPages: action.payload.totalPages,
           totalElements: action.payload.totalElements,
@@ -111,5 +118,5 @@ const coursesSlice = createSlice({
   },
 });
 
-export const { setFilters, clearFilters, setCoursePage } = coursesSlice.actions;
+export const { setFilters, clearFilters, setCoursePage, setPageSize } = coursesSlice.actions;
 export default coursesSlice.reducer;

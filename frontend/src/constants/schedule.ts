@@ -20,14 +20,14 @@ export const DAY_COLUMNS = [
 ] as const;
 
 export const COURSE_COLORS = [
-  '#1976d2',
-  '#388e3c',
-  '#f57c00',
-  '#7b1fa2',
-  '#c62828',
+  '#2e7d32',
+  '#e65100',
+  '#6a1b9a',
   '#00838f',
+  '#c62828',
+  '#ff8f00',
   '#4e342e',
-  '#283593',
+  '#1565c0',
 ] as const;
 
 export const LUNCH_START_TIME = '12:00';

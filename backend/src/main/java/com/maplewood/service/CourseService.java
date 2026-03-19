@@ -22,8 +22,8 @@ public class CourseService {
     private final CourseSectionRepository courseSectionRepository;
     private final EnrollmentRepository enrollmentRepository;
 
-    public Page<CourseDTO> getAllCourses(Integer grade, Integer semesterOrder, Pageable pageable) {
-        return courseRepository.findWithFilters(grade, semesterOrder, pageable)
+    public Page<CourseDTO> getAllCourses(Integer grade, Integer semesterOrder, String search, Pageable pageable) {
+        return courseRepository.findWithFilters(grade, semesterOrder, search, pageable)
                 .map(CourseDTO::fromEntity);
     }
 

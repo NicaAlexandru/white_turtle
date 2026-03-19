@@ -82,13 +82,14 @@ const CourseCard: React.FC<CourseCardProps> = ({
         <Tooltip title={tooltipTitle} arrow>
           <span>
             <Button
-              variant="contained"
+              variant={canEnroll ? 'contained' : 'outlined'}
               size="small"
               disabled={!canEnroll}
               onClick={() => onViewSections(course)}
               fullWidth
+              disableRipple={!canEnroll}
             >
-              {alreadyEnrolled ? 'Enrolled' : 'View Sections'}
+              {alreadyEnrolled ? '✓ Enrolled' : !prerequisiteMet ? 'Prerequisite Required' : 'View Sections'}
             </Button>
           </span>
         </Tooltip>

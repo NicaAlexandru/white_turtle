@@ -1,29 +1,47 @@
 import React from 'react';
-import { Box, FormControl, InputLabel, MenuItem, Select, Button } from '@mui/material';
-import FilterListIcon from '@mui/icons-material/FilterList';
+import { Box, FormControl, InputLabel, MenuItem, Select, Button, TextField, InputAdornment } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
-import './CourseCard.css';
 
 interface CourseFiltersProps {
   grade?: number;
   semester?: number;
+  search: string;
   onGradeChange: (grade?: number) => void;
   onSemesterChange: (semester?: number) => void;
+  onSearchChange: (search: string) => void;
   onClear: () => void;
 }
 
 const CourseFilters: React.FC<CourseFiltersProps> = ({
   grade,
   semester,
+  search,
   onGradeChange,
   onSemesterChange,
+  onSearchChange,
   onClear,
 }) => {
+  const hasActiveFilters = grade !== undefined || semester !== undefined || search.length > 0;
+
   return (
     <Box display="flex" alignItems="center" gap={2} mb={3} flexWrap="wrap">
-      <FilterListIcon color="action" />
+      <TextField
+        size="small"
+        placeholder="Search courses..."
+        value={search}
+        onChange={(e) => onSearchChange(e.target.value)}
+        style={{ minWidth: 240 }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon fontSize="small" color="action" />
+            </InputAdornment>
+          ),
+        }}
+      />
 
-      <FormControl size="small" className="filter-select">
+      <FormControl size="small" style={{ minWidth: 200 }}>
         <InputLabel>Grade Level</InputLabel>
         <Select
           value={grade ?? ''}
@@ -41,7 +59,7 @@ const CourseFilters: React.FC<CourseFiltersProps> = ({
         </Select>
       </FormControl>
 
-      <FormControl size="small" className="filter-select">
+      <FormControl size="small" style={{ minWidth: 200 }}>
         <InputLabel>Semester</InputLabel>
         <Select
           value={semester ?? ''}
@@ -57,7 +75,7 @@ const CourseFilters: React.FC<CourseFiltersProps> = ({
         </Select>
       </FormControl>
 
-      {(grade !== undefined || semester !== undefined) && (
+      {hasActiveFilters && (
         <Button size="small" startIcon={<ClearIcon />} onClick={onClear}>
           Clear
         </Button>

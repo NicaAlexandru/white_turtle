@@ -43,7 +43,7 @@ class CourseControllerTest {
                 .build();
 
         Page<CourseDTO> page = new PageImpl<>(List.of(dto), PageRequest.of(0, 10), 1);
-        when(courseService.getAllCourses(isNull(), isNull(), any(Pageable.class))).thenReturn(page);
+        when(courseService.getAllCourses(isNull(), isNull(), isNull(), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/courses"))
                 .andExpect(status().isOk())
@@ -57,7 +57,7 @@ class CourseControllerTest {
     @DisplayName("GET /courses?grade=10&semester=1 — filters applied")
     void getCoursesWithFilters() throws Exception {
         Page<CourseDTO> page = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
-        when(courseService.getAllCourses(eq(10), eq(1), any(Pageable.class))).thenReturn(page);
+        when(courseService.getAllCourses(eq(10), eq(1), isNull(), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/courses")
                         .param("grade", "10")

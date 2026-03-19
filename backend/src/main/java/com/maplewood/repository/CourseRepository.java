@@ -18,9 +18,12 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     @Query("SELECT c FROM Course c " +
             "WHERE (:grade IS NULL OR (c.gradeLevelMin <= :grade AND c.gradeLevelMax >= :grade)) " +
             "AND (:semesterOrder IS NULL OR c.semesterOrder = :semesterOrder) " +
+            "AND (:search IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%')) " +
+            "     OR LOWER(c.code) LIKE LOWER(CONCAT('%', :search, '%'))) " +
             "ORDER BY c.code")
     Page<Course> findWithFilters(@Param("grade") Integer grade,
                                 @Param("semesterOrder") Integer semesterOrder,
+                                @Param("search") String search,
                                 Pageable pageable);
 
     @EntityGraph(attributePaths = {"prerequisite", "specialization"})

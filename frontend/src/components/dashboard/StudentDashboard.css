@@ -1,7 +1,37 @@
+/* Student header */
+.student-header {
+  background-color: #f5f5f5;
+  padding: 20px 24px;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  border: 1px solid #e0e0e0;
+}
+
+.student-header-name {
+  font-weight: 700;
+  color: #212121;
+}
+
+.student-header-details {
+  color: #757575;
+}
+
+/* Stat cards */
+.stat-card {
+  height: 100%;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
 .stat-card-header {
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .stat-card-value-row {
@@ -10,14 +40,30 @@
   gap: 8px;
 }
 
+/* Graduation progress */
 .graduation-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .graduation-progress-bar {
-  height: 10px;
-  border-radius: 5px;
+  height: 12px;
+  border-radius: 6px;
+}
+
+/* Empty state */
+.empty-history {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.empty-history-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+  opacity: 0.3;
 }

@@ -9,6 +9,7 @@ import ErrorAlert from '../common/ErrorAlert';
 import StatCard from './StatCard';
 import GraduationProgress from './GraduationProgress';
 import CourseHistory from './CourseHistory';
+import './StudentDashboard.css';
 
 const StudentDashboard: React.FC = () => {
   const { profile, status, error } = useAppSelector((state) => state.student);
@@ -22,12 +23,14 @@ const StudentDashboard: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h5" fontWeight={600} gutterBottom>
-        {profile.firstName} {profile.lastName}
-      </Typography>
-      <Typography variant="body2" color="text.secondary" mb={3}>
-        Grade {profile.gradeLevel} &bull; {profile.email}
-      </Typography>
+      <Box className="student-header">
+        <Typography variant="h5" className="student-header-name">
+          {profile.firstName} {profile.lastName}
+        </Typography>
+        <Typography variant="body2" className="student-header-details">
+          Grade {profile.gradeLevel} &bull; {profile.email}
+        </Typography>
+      </Box>
 
       <Grid container spacing={3} mb={4}>
         <Grid item xs={12} sm={4}>
@@ -41,19 +44,19 @@ const StudentDashboard: React.FC = () => {
         </Grid>
         <Grid item xs={12} sm={4}>
           <StatCard
-            icon={<MenuBookIcon color="secondary" />}
+            icon={<MenuBookIcon color="primary" />}
             label="Credits Earned"
             value={profile.creditsEarned}
-            valueColor="secondary.main"
+            valueColor="primary.main"
             caption={`of ${profile.creditsRequired} required`}
           />
         </Grid>
         <Grid item xs={12} sm={4}>
           <StatCard
-            icon={<EmojiEventsIcon color="success" />}
+            icon={<EmojiEventsIcon color="primary" />}
             label="Courses"
             value={passedCourses}
-            valueColor="success.main"
+            valueColor="primary.main"
             extra={
               <Typography variant="body2" color="text.secondary">
                 passed

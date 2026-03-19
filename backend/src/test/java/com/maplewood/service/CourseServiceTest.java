@@ -47,9 +47,9 @@ class CourseServiceTest {
         Course c2 = TestUtils.course(11L, "ART101", "Art I", 9, 12, CourseType.elective);
         Page<Course> page = new PageImpl<>(List.of(c1, c2), pageable, 2);
 
-        when(courseRepository.findWithFilters(eq(10), eq(1), any(Pageable.class))).thenReturn(page);
+        when(courseRepository.findWithFilters(eq(10), eq(1), isNull(), any(Pageable.class))).thenReturn(page);
 
-        Page<CourseDTO> result = courseService.getAllCourses(10, 1, pageable);
+        Page<CourseDTO> result = courseService.getAllCourses(10, 1, null, pageable);
 
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getContent().get(0).getCode()).isEqualTo("ENG101");
@@ -61,9 +61,9 @@ class CourseServiceTest {
     @DisplayName("Returns empty page when no courses match")
     void noMatchingCourses() {
         Page<Course> empty = new PageImpl<>(List.of(), pageable, 0);
-        when(courseRepository.findWithFilters(isNull(), isNull(), any(Pageable.class))).thenReturn(empty);
+        when(courseRepository.findWithFilters(isNull(), isNull(), isNull(), any(Pageable.class))).thenReturn(empty);
 
-        Page<CourseDTO> result = courseService.getAllCourses(null, null, pageable);
+        Page<CourseDTO> result = courseService.getAllCourses(null, null, null, pageable);
 
         assertThat(result.getContent()).isEmpty();
         assertThat(result.getTotalElements()).isZero();

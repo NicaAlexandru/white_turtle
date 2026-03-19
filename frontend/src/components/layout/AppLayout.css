@@ -4,8 +4,12 @@
   min-height: 100vh;
 }
 
+.app-bar {
+  border-bottom: 1px solid #e0e0e0;
+}
+
 .app-toolbar-icon {
-  margin-right: 12px;
+  margin-right: 8px;
 }
 
 .app-toolbar-title {
@@ -13,26 +17,45 @@
   font-weight: 600;
 }
 
+.student-id-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.student-id-label {
+  color: rgba(255, 255, 255, 0.8);
+  white-space: nowrap;
+}
+
 .student-id-input {
-  width: 120px;
+  width: 80px;
 }
 
 .student-id-input .MuiInputBase-root {
   background-color: rgba(255, 255, 255, 0.15);
   color: white;
-}
-
-.student-id-input .MuiInputLabel-root {
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  height: 30px;
 }
 
 .student-id-input .MuiOutlinedInput-notchedOutline {
   border-color: rgba(255, 255, 255, 0.3);
 }
 
-.app-tabs {
-  padding-left: 16px;
-  padding-right: 16px;
+.app-tabs-bar {
+  background-color: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0 16px;
+}
+
+.app-tabs .MuiTab-root {
+  min-height: 40px;
+  font-size: 0.85rem;
+}
+
+.app-tabs .MuiTab-root:focus {
+  outline: none;
 }
 
 .app-content {
