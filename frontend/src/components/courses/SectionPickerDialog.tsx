@@ -13,12 +13,12 @@ import {
   TableRow,
   Chip,
   Typography,
-  Box,
 } from '@mui/material';
 import { Course, CourseSection, ValidationError, LoadingStatus } from '../../types';
 import { formatTimeSlot } from '../../utils/format';
 import LoadingSpinner from '../common/LoadingSpinner';
 import ErrorAlert from '../common/ErrorAlert';
+import EnrollConfirmDialog from './EnrollConfirmDialog';
 
 interface SectionPickerDialogProps {
   open: boolean;
@@ -140,45 +140,14 @@ const SectionPickerDialog: React.FC<SectionPickerDialogProps> = ({
         </DialogActions>
       </Dialog>
 
-      {/* Confirmation dialog */}
-      <Dialog open={!!confirmSection} onClose={() => setConfirmSection(null)} maxWidth="sm" fullWidth>
-        <DialogTitle>Confirm Enrollment</DialogTitle>
-        <DialogContent dividers>
-          <Typography variant="body1" gutterBottom>
-            You are about to enroll in:
-          </Typography>
-          <Box mt={2} mb={1} p={2} bgcolor="grey.50" borderRadius={2}>
-            <Typography variant="h6" gutterBottom>
-              {course?.code} — Section {confirmSection?.sectionNumber}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {course?.name}
-            </Typography>
-            <Box display="flex" gap={3} mt={2}>
-              <Box>
-                <Typography variant="caption" color="text.secondary">Schedule</Typography>
-                <Typography variant="body2">
-                  {confirmSection && formatTimeSlot(confirmSection.days, confirmSection.startTime, confirmSection.endTime)}
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="caption" color="text.secondary">Teacher</Typography>
-                <Typography variant="body2">{confirmSection?.teacherName}</Typography>
-              </Box>
-              <Box>
-                <Typography variant="caption" color="text.secondary">Room</Typography>
-                <Typography variant="body2">{confirmSection?.classroomName}</Typography>
-              </Box>
-            </Box>
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button onClick={() => setConfirmSection(null)}>Cancel</Button>
-          <Button variant="contained" onClick={handleConfirmEnroll} disabled={enrolling} size="large">
-            {enrolling ? 'Enrolling...' : 'Confirm Enrollment'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <EnrollConfirmDialog
+        open={!!confirmSection}
+        course={course}
+        section={confirmSection}
+        enrolling={enrolling}
+        onConfirm={handleConfirmEnroll}
+        onCancel={() => setConfirmSection(null)}
+      />
     </>
   );
 };

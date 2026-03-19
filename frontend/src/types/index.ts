@@ -77,6 +77,7 @@ export interface ScheduleEntry {
   courseId: number;
   courseCode: string;
   courseName: string;
+  credits: number;
   teacherName: string;
   classroomName: string;
   days: string;

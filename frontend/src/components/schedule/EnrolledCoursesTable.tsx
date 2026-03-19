@@ -43,6 +43,7 @@ const EnrolledCoursesTable: React.FC<EnrolledCoursesTableProps> = ({
                 <TableRow>
                   <TableCell><strong>Code</strong></TableCell>
                   <TableCell><strong>Course</strong></TableCell>
+                  <TableCell><strong>Credits</strong></TableCell>
                   <TableCell><strong>Schedule</strong></TableCell>
                   <TableCell><strong>Teacher</strong></TableCell>
                   <TableCell><strong>Room</strong></TableCell>
@@ -58,6 +59,7 @@ const EnrolledCoursesTable: React.FC<EnrolledCoursesTableProps> = ({
                       </Typography>
                     </TableCell>
                     <TableCell>{entry.courseName}</TableCell>
+                    <TableCell>{entry.credits}</TableCell>
                     <TableCell>
                       {formatTimeSlot(entry.days, entry.startTime, entry.endTime)}
                     </TableCell>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { Box, Grid, Typography, Pagination, FormControl, Select, MenuItem, InputLabel } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchCourses, fetchSections, setFilters, clearFilters, setCoursePage, setPageSize } from '../../store/slices/coursesSlice';
 import { enrollInSection, clearValidationError, clearSuccessMessage, fetchSchedule } from '../../store/slices/scheduleSlice';
@@ -10,6 +10,7 @@ import SectionPickerDialog from './SectionPickerDialog';
 import LoadingSpinner from '../common/LoadingSpinner';
 import ErrorAlert from '../common/ErrorAlert';
 import SuccessSnackbar from '../common/SuccessSnackbar';
+import PaginationBar from '../common/PaginationBar';
 
 const SEARCH_DEBOUNCE_MS = 600;
 
@@ -66,9 +67,7 @@ const CourseBrowser: React.FC = () => {
     dispatch(clearFilters());
   }, [dispatch]);
 
-  const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
-    dispatch(setCoursePage(page - 1));
-  };
+  const handlePageChange = (page: number) => dispatch(setCoursePage(page));
 
   const handleViewSections = (course: Course) => {
     setSelectedCourse(course);
@@ -102,7 +101,7 @@ const CourseBrowser: React.FC = () => {
   if (status === 'failed') return <ErrorAlert message={error || 'Failed to load courses'} />;
 
   return (
-    <Box>
+    <Box display="flex" flexDirection="column" sx={{ minHeight: 'calc(100vh - 160px)' }}>
       <Typography variant="h5" fontWeight={600} gutterBottom>
         Course Catalog
       </Typography>
@@ -120,47 +119,34 @@ const CourseBrowser: React.FC = () => {
         onClear={handleClearFilters}
       />
 
-      <Grid container spacing={2}>
-        {courses.map((course) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={course.id}>
-            <CourseCard
-              course={course}
-              onViewSections={handleViewSections}
-              prerequisiteMet={isPrerequisiteMet(course)}
-              alreadyEnrolled={isAlreadyEnrolled(course)}
-            />
-          </Grid>
-        ))}
-      </Grid>
+      <Box flex={1}>
+        <Grid container spacing={2}>
+          {courses.map((course) => (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={course.id}>
+              <CourseCard
+                course={course}
+                onViewSections={handleViewSections}
+                prerequisiteMet={isPrerequisiteMet(course)}
+                alreadyEnrolled={isAlreadyEnrolled(course)}
+              />
+            </Grid>
+          ))}
+        </Grid>
 
-      {courses.length === 0 && status === 'succeeded' && (
-        <Box textAlign="center" py={6}>
-          <Typography color="text.secondary">No courses match the selected filters.</Typography>
-        </Box>
-      )}
-
-      <Box display="flex" justifyContent="center" alignItems="center" gap={3} mt={3}>
-        {pagination.totalPages > 1 && (
-          <Pagination
-            count={pagination.totalPages}
-            page={pagination.page + 1}
-            onChange={handlePageChange}
-            color="primary"
-          />
+        {courses.length === 0 && status === 'succeeded' && (
+          <Box textAlign="center" py={6}>
+            <Typography color="text.secondary">No courses match the selected filters.</Typography>
+          </Box>
         )}
-        <FormControl size="small" style={{ minWidth: 100 }}>
-          <InputLabel>Per page</InputLabel>
-          <Select
-            value={pagination.size}
-            label="Per page"
-            onChange={(e) => dispatch(setPageSize(Number(e.target.value)))}
-          >
-            <MenuItem value={12}>12</MenuItem>
-            <MenuItem value={24}>24</MenuItem>
-            <MenuItem value={48}>48</MenuItem>
-          </Select>
-        </FormControl>
       </Box>
+
+      <PaginationBar
+        page={pagination.page}
+        totalPages={pagination.totalPages}
+        pageSize={pagination.size}
+        onPageChange={handlePageChange}
+        onPageSizeChange={(size) => dispatch(setPageSize(size))}
+      />
 
       <SectionPickerDialog
         open={sectionDialogOpen}

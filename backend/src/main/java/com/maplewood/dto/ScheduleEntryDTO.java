@@ -14,6 +14,7 @@ public class ScheduleEntryDTO {
     private Long courseId;
     private String courseCode;
     private String courseName;
+    private Double credits;
     private String teacherName;
     private String classroomName;
     private String days;
@@ -32,6 +33,7 @@ public class ScheduleEntryDTO {
                 .courseId(course.getId())
                 .courseCode(course.getCode())
                 .courseName(course.getName())
+                .credits(course.getCredits())
                 .teacherName(section.getTeacher().getFullName())
                 .classroomName(section.getClassroom().getName())
                 .days(slot.getDays())

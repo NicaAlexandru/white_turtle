@@ -23,6 +23,5 @@ public interface StudentCourseHistoryRepository extends JpaRepository<StudentCou
             "WHERE h.student.id = :studentId " +
             "AND h.course.id = :courseId " +
             "AND h.status = 'passed'")
-    boolean hasPassedCourse(@Param("studentId") Long studentId,
-                            @Param("courseId") Long courseId);
+    boolean hasPassedCourse(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
 }

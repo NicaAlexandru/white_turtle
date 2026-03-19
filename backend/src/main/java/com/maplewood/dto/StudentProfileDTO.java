@@ -21,8 +21,7 @@ public class StudentProfileDTO {
     private Double creditsRequired;
     private List<CourseHistoryDTO> courseHistory;
 
-    public static StudentProfileDTO fromEntity(Student student, double gpa, double creditsEarned,
-                                                List<CourseHistoryDTO> courseHistory) {
+    public static StudentProfileDTO fromEntity(Student student, double gpa, double creditsEarned, List<CourseHistoryDTO> courseHistory) {
         return StudentProfileDTO.builder()
                 .id(student.getId())
                 .firstName(student.getFirstName())
