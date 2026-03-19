@@ -62,7 +62,7 @@ The system enforces six rules on every enrollment. Here's a concrete walkthrough
 2. Try **SCI101** section A — same time slot, blocked as a **time conflict**.
 3. Enroll in **MAT101** section A (TTh 09:00–10:00) — works.
 4. Try **ENG101** section B — blocked, **already enrolled** in that course.
-5. Try **CS401** (Computer Science Projects) — blocked, **grade 12 only**.
+5. Try **SOC301** (Economics) — blocked, **grade 12 only**.
 6. Try **ART201** (Art II: Painting) — blocked, **prerequisite** ART101 not passed.
 7. Enroll in three more (SPORT101, CS101, MUS101) to hit 5 total.
 8. Try **DRAMA101** — blocked, **max 5 courses** per semester.

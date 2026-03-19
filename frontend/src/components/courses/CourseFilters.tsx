@@ -38,6 +38,11 @@ const CourseFilters: React.FC<CourseFiltersProps> = ({
               <SearchIcon fontSize="small" color="action" />
             </InputAdornment>
           ),
+          endAdornment: search.length > 0 ? (
+            <InputAdornment position="end">
+              <ClearIcon fontSize="small" style={{ cursor: 'pointer' }} onClick={() => onSearchChange('')} />
+            </InputAdornment>
+          ) : null,
         }}
       />
 
@@ -75,11 +80,9 @@ const CourseFilters: React.FC<CourseFiltersProps> = ({
         </Select>
       </FormControl>
 
-      {hasActiveFilters && (
-        <Button size="small" startIcon={<ClearIcon />} onClick={onClear}>
-          Clear
-        </Button>
-      )}
+      <Button size="small" startIcon={<ClearIcon />} onClick={onClear}>
+        Show All
+      </Button>
     </Box>
   );
 };

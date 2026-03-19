@@ -26,7 +26,7 @@ const CourseBrowser: React.FC = () => {
 
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [sectionDialogOpen, setSectionDialogOpen] = useState(false);
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState(filters.search || '');
   const searchTimer = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
@@ -56,9 +56,13 @@ const CourseBrowser: React.FC = () => {
   const handleSearchChange = useCallback((value: string) => {
     setSearchText(value);
     clearTimeout(searchTimer.current);
-    searchTimer.current = setTimeout(() => {
-      dispatch(setFilters({ ...filters, search: value || undefined }));
-    }, SEARCH_DEBOUNCE_MS);
+    if (value === '') {
+      dispatch(setFilters({ ...filters, search: undefined }));
+    } else {
+      searchTimer.current = setTimeout(() => {
+        dispatch(setFilters({ ...filters, search: value }));
+      }, SEARCH_DEBOUNCE_MS);
+    }
   }, [dispatch, filters]);
 
   const handleClearFilters = useCallback(() => {
