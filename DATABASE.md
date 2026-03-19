@@ -1,239 +1,121 @@
-# 🗄️ Maplewood High School Database Documentation
+# Database Documentation
 
-## Database Overview
+## Overview
 
-The `maplewood_school.sqlite` database contains realistic sample data for Maplewood High School's scheduling system. This SQLite database is pre-populated with core foundational data, providing you with the entities needed to implement the scheduling challenges.
+The `maplewood_school.sqlite` file lives at the project root. It comes pre-populated with realistic sample data and is managed by Flyway — three versioned migrations handle the schema and seed data so you never need to run SQL manually.
 
-## Database Statistics
+## What's in there
 
 | Entity | Count | Description |
 |--------|-------|-------------|
-| **Teachers** | 50 | Distributed across 9 specializations |
-| **Students** | 400 | 100 students per grade level (9-12) |
-| **Courses** | 57 | 20 core courses + 37 elective courses with semester ordering |
-| **Classrooms** | 60 | Various types: classrooms, labs, studios, gym |
-| **Semesters** | 9 | 6 historical + current + 2 future semesters with ordering |
-| **Student Course History** | ~6,700 | Realistic academic records with pass/fail status |
-| **Specializations** | 9 | Subject areas for teachers and courses |
-| **Room Types** | 8 | Different classroom types and equipment |
+| Students | 400 | 100 per grade level (9–12) |
+| Courses | 57 | 20 core + 37 electives, with prerequisite chains |
+| Teachers | 50 | Distributed across 9 specializations |
+| Classrooms | 60 | Various types: regular rooms, labs, studios, gym |
+| Semesters | 9 | 6 historical + 1 active (Fall 2024) + 2 future |
+| Course history | ~6,500 | Pass/fail records for GPA and prerequisite validation |
+| Specializations | 9 | Subject areas for teachers and courses |
+| Room types | 8 | Classroom, science lab, art studio, gym, computer lab, music room, etc. |
+| Time slots | 14 | 7 periods × 2 day patterns (MWF and TTh), lunch skipped |
+| Course sections | 40 | Links a course to a teacher, classroom, and time slot for the active semester |
+| Enrollments | varies | Which students are signed up for which sections |
 
-## Key Tables and Relationships
+## Tables and Relationships
 
-### **Core Entities**
+### Core entities
 
-#### `teachers`
-- 50 teachers with realistic names and email addresses
-- Each teacher has one specialization (Mathematics, English, Science, etc.)
-- All teachers limited to 4 hours of teaching per day
+**students** — 400 students evenly split across grades 9–12. Each has an enrollment year, expected graduation year, and email. GPA is calculated from their course history, not stored directly.
 
-#### `students`
-- 400 students evenly distributed across grades 9-12
-- Each student has enrollment year and expected graduation year
-- Realistic email addresses following school naming convention
-- GPA can be calculated from their course history records
+**courses** — 20 core courses (English, Math, Science, Social Studies) and 37 electives (Arts, Music, PE, CS, Languages). Each course has a credit value, a grade range it's open to, and an optional prerequisite. Semester ordering (Fall = 1, Spring = 2) controls when courses are offered.
 
-#### `courses`
-- **20 core courses**: Required for all students (English, Math, Science, Social Studies)
-- **37 elective courses**: Optional courses (Arts, Music, PE, Computer Science, Languages)
-- **Semester ordering**: Each course assigned to Fall (1) or Spring (2) semester
-- Proper prerequisite chains (e.g., MAT101 → MAT102 → MAT201)
-- Logical academic progression enforced by database triggers
-- Varying credit values and weekly hour requirements
+**teachers** — 50 teachers, each tied to one specialization. Limited to 4 teaching hours per day. Distribution: Math (8), English (8), Science (10), Social Studies (6), Arts (4), Music (4), PE (4), CS (3), Foreign Language (3).
 
-#### `classrooms`
-- 60 rooms across 3 floors with different types and equipment
-- Room types include: classroom, science_lab, art_studio, gym, computer_lab, music_room
-- Each room has a capacity limit of 10 students
+**classrooms** — 60 rooms across 3 floors. 30 standard classrooms, 10 science labs, 6 art studios, 3 gyms, 6 computer labs, 5 music rooms. Each capped at 10 students.
 
-#### `semesters`
-- 9 configured semesters: 6 historical + current + 2 future
-- **Order-in-year**: Fall=1, Spring=2 for logical academic progression
-- Database constraints ensure proper semester naming and ordering
-- Historical semesters enable realistic student academic progression tracking
+**semesters** — Fall and Spring semesters with `order_in_year` (1 for Fall, 2 for Spring). The active semester is Fall 2024. Historical semesters give students realistic academic progression.
 
-#### `student_course_history`
-- **~6,700 records**: Realistic academic history for prerequisite validation
-- **Pass/fail tracking**: Only 'passed' and 'failed' statuses (85% pass rate)
-- **Prerequisite enforcement**: Database triggers prevent enrollment without prerequisites
-- **Duplicate prevention**: Students cannot retake courses they've already passed
-- **GPA calculation**: Course credits and pass/fail status enable GPA computation
+**student_course_history** — About 6,500 records tracking which courses each student passed or failed in which semester. This is what drives prerequisite checks, GPA calculation, and credit totals. Roughly 85% pass rate.
 
-### **Configuration Tables**
+### Scheduling tables (added in V2)
 
-#### `specializations`
-- Links teachers to their subject areas
-- Maps to required room types (e.g., Science → science_lab)
-- 9 specializations covering all academic areas
+**time_slots** — 14 slots covering a school day from 8 AM to 4 PM. Seven one-hour periods on two day patterns (MWF and TTh). The lunch hour (12–1 PM) is skipped.
 
-#### `room_types`
-- Defines different classroom types and their capabilities
-- Used to match courses with appropriate rooms
+**course_sections** — Each row is a specific section: one course, one teacher, one classroom, one time slot, one semester. Core courses have two sections (A and B), electives have one (A). 40 sections total for the active semester. Teachers and classrooms are assigned round-robin within their specialization/room type so there are no conflicts.
 
-### **Additional Tables**
+**enrollments** — When a student enrolls in a section, a row goes here with status `enrolled`. Dropping changes it to `dropped`. Unique on (student_id, section_id) so a student can't double-enroll in the same section.
 
-The provided database contains the foundational entities needed to get started. You can create additional tables as needed for your implementation of the scheduling challenges. This allows you the flexibility to design the optimal data structure for your solution approach.
+### Configuration tables
 
-## Sample Data Examples
+**specializations** — Nine subject areas (Mathematics, English, Science, etc.). Links teachers to their field and maps to the preferred room type (e.g., Science → science_lab).
 
-### **Semester Ordering System**
+**room_types** — Defines classroom categories. Used to match courses with appropriate rooms during section assignment.
 
-All courses are assigned to either Fall (semester_order=1) or Spring (semester_order=2) semesters:
+## Prerequisite chains
+
+Courses build on each other through prerequisite links. A few examples:
+
+```
+Math:    MAT101 → MAT102 → MAT201 → MAT202 → MAT301
+English: ENG101 → ENG102 → ENG201 → ENG202 → ENG301 → ENG302 → ENG401 → ENG402
+Science: SCI101 → SCI201 → SCI301
+Spanish: SPAN101 → SPAN201 → SPAN301
+```
+
+## Constraints and triggers
+
+The database enforces a few rules at the SQL level, independent of the application:
+
+- **Prerequisite ordering** — a trigger prevents inserting a course whose prerequisite has a later `semester_order` in the same grade level. Keeps the catalog logically consistent.
+- **Prerequisite completion** — a trigger on `student_course_history` blocks inserts if the student hasn't passed the prerequisite. The app also checks this in `ValidationService`, so this is a safety net.
+- **No duplicate passes** — another trigger prevents a student from being marked as having passed a course they already passed.
+- **Capacity and hours** — CHECK constraints cap classroom capacity at 10 and teacher daily hours at 4.
+- **Semester naming** — a CHECK constraint ensures Fall maps to `order_in_year = 1` and Spring to `order_in_year = 2`.
+
+## Flyway migrations
+
+All three live under `backend/src/main/resources/db/migration/`:
+
+| File | What it does |
+|------|-------------|
+| `V1__create_base_schema.sql` | The original 8 tables (students, courses, teachers, classrooms, semesters, student_course_history, specializations, room_types), indexes, and triggers |
+| `V2__add_scheduling_tables.sql` | Adds `time_slots`, `course_sections`, and `enrollments` with indexes |
+| `V3__seed_scheduling_data.sql` | Populates the 14 time slots and 40 course sections for the active semester |
+
+## Useful queries
 
 ```sql
--- Example: English sequence with semester ordering
-ENG101 (Fall) → ENG102 (Spring) → ENG201 (Fall) → ENG202 (Spring)
-
--- Mathematics sequence respects prerequisites and semesters
-MAT101 (Fall) → MAT102 (Spring) → MAT201 (Fall) → MAT202 (Spring)
-
--- Language progressions (Spanish, French, German)
-SPAN101 (Fall) → SPAN201 (Spring) → SPAN301 (Fall)
-```
-
-### **Prerequisite Chains**
-```sql
--- Mathematics sequence
-MAT101 (Algebra I) → MAT102 (Geometry) → MAT201 (Algebra II) → MAT202 (Pre-Calculus) → MAT301 (Calculus)
-
--- English sequence
-ENG101 → ENG102 → ENG201 → ENG202 → ENG301 → ENG302 → ENG401 → ENG402
-
--- Science progression
-SCI101 (Biology) → SCI201 (Chemistry) → SCI301 (Physics)
-```
-
-### **Teacher Distribution**
-- **Mathematics**: 8 teachers
-- **English**: 8 teachers
-- **Science**: 10 teachers
-- **Social Studies**: 6 teachers
-- **Arts**: 4 teachers
-- **Music**: 4 teachers
-- **Physical Education**: 4 teachers
-- **Computer Science**: 3 teachers
-- **Foreign Language**: 3 teachers
-
-### **Classroom Types**
-- **Standard Classrooms**: 30 rooms (Room-101 to Room-130)
-- **Science Labs**: 10 labs (Lab-1 to Lab-10)
-- **Art Studios**: 6 studios (Art-1 to Art-6)
-- **Gyms**: 3 gymnasiums (Gym-1 to Gym-3)
-- **Computer Labs**: 6 labs (CompLab-1 to CompLab-6)
-- **Music Rooms**: 5 rooms (Music-1 to Music-5)
-
-## Database Constraints
-
-### **Semester Ordering Constraints**
-- **Database triggers** enforce logical prerequisite progression
-- Prerequisites must be from same or earlier semester within the same grade level
-- Cross-grade prerequisites allowed (e.g., ENG102 Spring → ENG201 Fall next year)
-- Prevents illogical scheduling (e.g., Fall course requiring Spring prerequisite in same year)
-
-### **Built-In Constraints**
-- Students limited to 10 per classroom (capacity constraint)
-- Teachers limited to 4 hours per day (database constraint)
-- Course prerequisites enforced via foreign keys and triggers
-- Semester ordering enforced: Fall=1, Spring=2
-- Student course history validation via database triggers
-
-### **Database Triggers**
-- **Prerequisite completion enforcement**: Students cannot enroll in courses without passing prerequisites
-- **Duplicate course prevention**: Students cannot retake courses they've already passed
-- **Semester ordering validation**: Course prerequisites must follow logical academic progression
-
-### **Academic Rules**
-- Core courses: 4-6 hours per week each
-- Elective courses: 2-4 hours per week each
-- Students need 30 total credits to graduate
-- Maximum 5 courses per semester per student
-- No classes during lunch hour (12-1 PM)
-
-## Getting Started
-
-### **Connecting to the Database**
-```python
-import sqlite3
-conn = sqlite3.connect('maplewood_school.sqlite')
-```
-
-```javascript
-// Node.js with sqlite3
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('maplewood_school.sqlite');
-```
-
-```java
-// Java with JDBC
-String url = "jdbc:sqlite:maplewood_school.sqlite";
-Connection conn = DriverManager.getConnection(url);
-```
-
-### **Useful Sample Queries**
-
-```sql
--- Get all Fall semester courses for 10th graders
-SELECT code, name, semester_order, credits, hours_per_week
+-- Fall courses available to 10th graders
+SELECT code, name, credits, hours_per_week
 FROM courses
-WHERE grade_level_min <= 10 AND grade_level_max >= 10
-AND semester_order = 1;
+WHERE grade_level_min <= 10 AND grade_level_max >= 10 AND semester_order = 1;
 
--- Find all Science teachers
-SELECT t.*, s.name as specialization
-FROM teachers t
-JOIN specializations s ON t.specialization_id = s.id
-WHERE s.name = 'Science';
-
--- Check prerequisite chain with semester ordering
-SELECT c1.code, c1.name, c1.semester_order,
-       c2.code as prerequisite, c2.semester_order as prereq_order
-FROM courses c1
-LEFT JOIN courses c2 ON c1.prerequisite_id = c2.id
-WHERE c1.code = 'MAT201';
-
--- See all semesters with ordering
-SELECT name, year, order_in_year, is_active
-FROM semesters
-ORDER BY year, order_in_year;
-
--- Get student's completed courses and calculate GPA
-SELECT s.first_name, s.last_name, s.grade_level,
-       COUNT(sch.course_id) as courses_taken,
-       COUNT(CASE WHEN sch.status = 'passed' THEN 1 END) as courses_passed,
+-- A student's GPA and credit total
+SELECT s.first_name, s.last_name,
        SUM(CASE WHEN sch.status = 'passed' THEN c.credits ELSE 0 END) as credits_earned,
-       IFNULL(ROUND(
-         SUM(CASE WHEN sch.status = 'passed' THEN c.credits ELSE 0 END) / SUM(c.credits) * 4.0, -- Assuming a 4.0 scale for GPA calculation is "(credits earned / total credits taken) * 4"
-         2
-       ), 0) as calculated_gpa
+       ROUND(SUM(CASE WHEN sch.status = 'passed' THEN c.credits ELSE 0 END)
+             / SUM(c.credits) * 4.0, 2) as gpa
 FROM students s
-LEFT JOIN student_course_history sch ON s.id = sch.student_id
-LEFT JOIN courses c ON sch.course_id = c.id
-WHERE s.id = 100
+JOIN student_course_history sch ON s.id = sch.student_id
+JOIN courses c ON sch.course_id = c.id
+WHERE s.id = 220
 GROUP BY s.id;
 
--- Check if student can enroll in a course (prerequisites met)
-SELECT c.code, c.name,
-       CASE
-         WHEN c.prerequisite_id IS NULL THEN 'No prerequisite required'
-         WHEN EXISTS (
-           SELECT 1 FROM student_course_history sch
-           WHERE sch.student_id = 100
-           AND sch.course_id = c.prerequisite_id
-           AND sch.status = 'passed'
-         ) THEN 'Prerequisites met'
-         ELSE 'Missing prerequisite: ' || prereq.code
-       END as enrollment_status
+-- Check prerequisite chain for a course
+SELECT c.code, c.name, p.code as prerequisite
 FROM courses c
-LEFT JOIN courses prereq ON c.prerequisite_id = prereq.id
+LEFT JOIN courses p ON c.prerequisite_id = p.id
 WHERE c.code = 'MAT201';
+
+-- Sections for the active semester with teacher and room info
+SELECT cs.section_number, c.code, c.name,
+       t.first_name || ' ' || t.last_name as teacher,
+       cl.name as room, ts.days, ts.start_time, ts.end_time
+FROM course_sections cs
+JOIN courses c ON cs.course_id = c.id
+JOIN teachers t ON cs.teacher_id = t.id
+JOIN classrooms cl ON cs.classroom_id = cl.id
+JOIN time_slots ts ON cs.time_slot_id = ts.id
+JOIN semesters sem ON cs.semester_id = sem.id
+WHERE sem.is_active = 1
+ORDER BY ts.id, cs.section_number;
 ```
-
-## Your Tasks
-
-1. **Challenge 1**: Create and populate tables for a complete master schedule that respects semester ordering
-2. **Challenge 2**: Allow students to select courses with proper prerequisite and semester validation
-
-The database provides all the foundational data with built-in semester ordering constraints. Focus your time on the algorithmic challenges of constraint satisfaction and user interface development!
-
----
-
-*Generated for Maplewood High School Fullstack Coding Challenge*
