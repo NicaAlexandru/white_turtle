@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
@@ -34,4 +35,6 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
             "AND e.section.course.id = :courseId " +
             "AND e.status = 'enrolled'")
     boolean isAlreadyEnrolledInCourse(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
+
+    Optional<Enrollment> findByStudentIdAndSectionId(Long studentId, Long sectionId);
 }

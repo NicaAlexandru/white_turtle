@@ -35,9 +35,15 @@ public class EnrollmentService {
 
         validationService.validateEnrollment(student, section);
 
-        Enrollment enrollment = new Enrollment();
-        enrollment.setStudent(student);
-        enrollment.setSection(section);
+        // Re-activate a previously dropped enrollment if one exists, otherwise create new
+        Enrollment enrollment = enrollmentRepository
+                .findByStudentIdAndSectionId(student.getId(), section.getId())
+                .orElseGet(() -> {
+                    Enrollment e = new Enrollment();
+                    e.setStudent(student);
+                    e.setSection(section);
+                    return e;
+                });
         enrollment.setStatus(EnrollmentStatus.enrolled);
         enrollment = enrollmentRepository.save(enrollment);
 
